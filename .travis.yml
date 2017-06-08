@@ -14,7 +14,7 @@ env:
     - FLYVEMDM_DEV="https://github.com/btry/flyve-mdm-glpi -b develop"
     - FUSION_SOURCE="https://github.com/fusioninventory/fusioninventory-for-glpi -b master"
   matrix:
-    - GLPI_SOURCE=$GLPI_MASTER FLYVEMDM_SOURCE=$FLYVEMDM_DEV
+    - GLPI_SOURCE=$GLPI_MASTER FLYVEMDM_SOURCE=$FLYVEMDM_DEV PATCH_FI=0
     
 before_script:
   - git clone --depth=1 $GLPI_SOURCE ../glpi && cd ../glpi
@@ -24,6 +24,9 @@ before_script:
   - cp tests/config_db.php config/config_db.php
   - mkdir plugins/fusioninventory && git clone --depth=1 $FUSION_SOURCE plugins/fusioninventory
   - mkdir plugins/flyvemdm && git clone --depth=1 $FLYVEMDM_SOURCE plugins/flyvemdm
+  - cd plugins/fusioninventory
+  - if [[ ${PATCH_FI} == "1" ]]; then git apply --check  ../flyvemdm/tests/patches/fi_version-check.patch && git apply ../flyvemdm/tests/patches/fi_version-check.patch; fi
+  - cd ../..
   - cd plugins/flyvemdm && composer install --no-dev && cd ../..
   - cd plugins/flyvemdmdemo && composer install && cd ../..
 
